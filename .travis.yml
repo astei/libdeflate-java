@@ -1,6 +1,9 @@
 language: java
 arch:
-  - arm64
+  - amd64
+jdk:
+  - openjdk8
+  - openjdk11
 env:
   - CC=gcc
 before_install:
@@ -12,9 +15,3 @@ install: skip
 script:
   - 'export JAVA_HOME="$(realpath -Pm "$(which javac)/../../")"'
   - './gradlew check'
-
-jobs:
-  exclude:
-    # This build fails due to a fault on Travis's end. Apparently there's no ARM64 build of OpenJDK 8, which is... weird.
-    - jdk: openjdk8
-      arch: arm64
