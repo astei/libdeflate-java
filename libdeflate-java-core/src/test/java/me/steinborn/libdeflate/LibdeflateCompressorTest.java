@@ -33,13 +33,14 @@ public class LibdeflateCompressorTest {
         }
         source.flip();
 
-        LibdeflateCompressor compressor = new LibdeflateCompressor();
-        compressor.compress(source, destination, compressionType);
+        try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+            compressor.compress(source, destination, compressionType);
 
-        destination.flip();
+            destination.flip();
 
-        source.position(0);
-        verifyWrittenData(source, destination, compressionType);
+            source.position(0);
+            verifyWrittenData(source, destination, compressionType);
+        }
     }
 
     @ParameterizedTest
@@ -54,13 +55,14 @@ public class LibdeflateCompressorTest {
         source.flip();
         source.position(5);
 
-        LibdeflateCompressor compressor = new LibdeflateCompressor();
-        compressor.compress(source, destination, compressionType);
+        try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+            compressor.compress(source, destination, compressionType);
 
-        destination.flip();
+            destination.flip();
 
-        source.position(5);
-        verifyWrittenData(source, destination, compressionType);
+            source.position(5);
+            verifyWrittenData(source, destination, compressionType);
+        }
     }
 
     @ParameterizedTest
@@ -73,9 +75,10 @@ public class LibdeflateCompressorTest {
             sourceAsBuf.putInt(4);
         }
 
-        LibdeflateCompressor compressor = new LibdeflateCompressor();
-        int produced = compressor.compress(source, destination, compressionType);
-        verifyWrittenData(ByteBuffer.wrap(source), ByteBuffer.wrap(destination, 0, produced), compressionType);
+        try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+            int produced = compressor.compress(source, destination, compressionType);
+            verifyWrittenData(ByteBuffer.wrap(source), ByteBuffer.wrap(destination, 0, produced), compressionType);
+        }
     }
 
     @ParameterizedTest
@@ -88,10 +91,11 @@ public class LibdeflateCompressorTest {
             sourceAsBuf.putInt(4);
         }
 
-        LibdeflateCompressor compressor = new LibdeflateCompressor();
-        int produced = compressor.compress(source, 5, source.length - 5, destination, 0, destination.length, compressionType);
-        sourceAsBuf.position(5);
-        verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 0, produced), compressionType);
+        try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+            int produced = compressor.compress(source, 5, source.length - 5, destination, 0, destination.length, compressionType);
+            sourceAsBuf.position(5);
+            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 0, produced), compressionType);
+        }
     }
 
     @ParameterizedTest
@@ -104,10 +108,11 @@ public class LibdeflateCompressorTest {
             sourceAsBuf.putInt(4);
         }
 
-        LibdeflateCompressor compressor = new LibdeflateCompressor();
-        int produced = compressor.compress(source, 0, source.length, destination, 10, destination.length - 10, compressionType);
-        sourceAsBuf.position(0);
-        verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 10, produced), compressionType);
+        try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+            int produced = compressor.compress(source, 0, source.length, destination, 10, destination.length - 10, compressionType);
+            sourceAsBuf.position(0);
+            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 10, produced), compressionType);
+        }
     }
 
     private void verifyWrittenData(ByteBuffer source, ByteBuffer destination, CompressionType compressionType) throws Exception {
