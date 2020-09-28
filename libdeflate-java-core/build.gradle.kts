@@ -6,10 +6,6 @@ plugins {
     `java-library`
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-}
-
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.7.0\"")
@@ -71,6 +67,11 @@ tasks.jar {
     val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
     val osArch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH)
     archiveClassifier.set("${osName}-${osArch}")
+}
+
+tasks.named<Test>("test") {
+    dependsOn(tasks.get("compileNatives"))
+    useJUnitPlatform()
 }
 
 tasks.jar {
