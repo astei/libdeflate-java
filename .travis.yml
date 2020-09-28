@@ -12,8 +12,9 @@ before_install:
   - sudo apt-get -y install make
 
 # Travis CI does not export JAVA_HOME for arm64: https://travis-ci.community/t/java-home-is-not-exported-for-arm64-architecture/6993/3
-before_script:
+script:
   - 'export JAVA_HOME="$(realpath -Pm "$(which javac)/../../")"'
+  - './gradlew check'
 
 jobs:
   exclude:
