@@ -24,12 +24,19 @@
 # LIB_NAME - the name of the native library
 # DYLIB_SUFFIX - indicates the suffix of native libraries used by the system
 
+cc-option = $(shell if $(CC) $(1) -c -x c /dev/null -o /dev/null \
+	      1>&2 2>/dev/null; then echo $(1); fi)
+
 SRC_DIR = src/main/c
 JNI_INCLUDE_DIR = $(JAVA_HOME)/include
 JNI_INCLUDES = -I$(JNI_INCLUDE_DIR) -I$(JNI_INCLUDE_DIR)/$(JNI_PLATFORM)
 LIB = $(LIB_DIR)/$(LIB_NAME).$(DYLIB_SUFFIX)
 
-CFLAGS += -std=c99 -fvisibility=hidden $(JNI_INCLUDES) -I$(SRC_DIR)/libdeflate -I$(SRC_DIR)/libdeflate/common -I$(SRC_DIR)/libdeflate/lib
+CFLAGS += -std=c99 -fvisibility=hidden \
+	$(JNI_INCLUDES) -I$(SRC_DIR)/libdeflate -I$(SRC_DIR)/libdeflate/common -I$(SRC_DIR)/libdeflate/lib \
+	$(call cc-option,-Wpedantic) \
+    $(call cc-option,-Wvla)	\
+    $(call cc-option,-Wimplicit-fallthrough)
 
 SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*/cpu_features.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
