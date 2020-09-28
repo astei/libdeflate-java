@@ -28,7 +28,9 @@ task("compileNatives") {
             }
             Os.isFamily(Os.FAMILY_UNIX) -> {
                 // Cover most Unices. It's 2020, so hopefully you're compiling on a modern open-source BSD or Linux distribution...
-                env["CC"] = "gcc"
+                if (System.getenv("CC") == null) {
+                    env["CC"] = "gcc"
+                }
                 val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
                 env["DYLIB_SUFFIX"] = "so"
                 env["JNI_PLATFORM"] = osName
