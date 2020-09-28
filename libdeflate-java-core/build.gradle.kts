@@ -69,6 +69,10 @@ tasks.jar {
     archiveClassifier.set("${osName}-${osArch}")
 }
 
+tasks.named<ProcessResources>("processResources") {
+    dependsOn(tasks.get("compileNatives"))
+}
+
 tasks.named<Test>("test") {
     dependsOn(tasks.get("compileNatives"))
     useJUnitPlatform()

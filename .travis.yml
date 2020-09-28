@@ -6,6 +6,7 @@ jdk:
   - openjdk11
 env:
   - CC=gcc
+  - CC=clang
 before_install:
   - sudo apt-get -y install make
 
