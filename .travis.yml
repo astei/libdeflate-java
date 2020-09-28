@@ -1,4 +1,7 @@
 language: java
+arch:
+  - amd64
+  - arm64
 jdk:
   - openjdk8
   - openjdk11
