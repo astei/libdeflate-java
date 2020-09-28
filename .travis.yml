@@ -1,17 +1,14 @@
 language: java
 arch:
-  - amd64
   - arm64
-jdk:
-  - openjdk8
-  - openjdk11
 env:
   - CC=gcc
-  - CC=clang
 before_install:
   - sudo apt-get -y install make
 
 # Travis CI does not export JAVA_HOME for arm64: https://travis-ci.community/t/java-home-is-not-exported-for-arm64-architecture/6993/3
+# We use an ugly hack to try and get this working.
+install: skip
 script:
   - 'export JAVA_HOME="$(realpath -Pm "$(which javac)/../../")"'
   - './gradlew check'
