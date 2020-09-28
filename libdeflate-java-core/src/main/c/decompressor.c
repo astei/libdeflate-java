@@ -1,4 +1,3 @@
-#include <jni.h>
 #include "./common.h"
 #include "./jni_util.h"
 #include "./libdeflate/libdeflate.h"

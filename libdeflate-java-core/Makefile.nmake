@@ -1,0 +1,47 @@
+#
+# Makefile for the Microsoft toolchain
+#
+# Usage:
+#	nmake /f Makefile.nmake
+#
+
+.SUFFIXES: .c .obj .dllobj
+
+CC = cl
+LD = link
+AR = lib
+CFLAGS = /MD /O2 -Isrc\main\c\libdeflate -Isrc\main\c -I"$(JAVA_HOME)\include" -I"$(JAVA_HOME)\include\win32"
+LDFLAGS =
+
+SHARED_LIB = ..\tmp\compiled\windows\amd64\libdeflate_jni.dll
+
+SHARED_LIB_OBJ =			\
+	  src/main/c/libdeflate/lib/adler32.obj		\
+	  src/main/c/libdeflate/lib/crc32.obj			\
+	  src/main/c/libdeflate/lib/deflate_compress.obj	\
+	  src/main/c/libdeflate/lib/deflate_decompress.obj	\
+	  src/main/c/libdeflate/lib/gzip_compress.obj		\
+	  src/main/c/libdeflate/lib/gzip_decompress.obj	\
+	  src/main/c/libdeflate/lib/utils.obj			\
+	  src/main/c/libdeflate/lib/x86/cpu_features.obj	\
+	  src/main/c/libdeflate/lib/zlib_compress.obj		\
+	  src/main/c/libdeflate/lib/zlib_decompress.obj    \
+	  src/main/c/jni_util.obj	\
+	  src/main/c/checksums.obj	\
+	  src/main/c/compressor.obj	\
+	  src/main/c/decompressor.obj
+
+all: directories $(SHARED_LIB)
+
+clean:
+	-del /s /q ..\tmp 2>nul
+	-del src\main\c\*.obj src\main\c\libdeflate\lib\*.obj src\main\c\libdeflate\lib\x86\*.obj
+
+directories:
+	-mkdir ..\tmp\compiled\windows\amd64
+
+.c.obj:
+	$(CC) -c /Fo$@ $(CFLAGS) $**
+
+$(SHARED_LIB): $(SHARED_LIB_OBJ)
+	$(LD) $(LDFLAGS) -out:$@ -dll $(SHARED_LIB_OBJ)

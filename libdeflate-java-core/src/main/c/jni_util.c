@@ -1,4 +1,3 @@
-#include <jni.h>
 #include "jni_util.h"
 
 void throwException(JNIEnv *env, const char *type, const char *msg) {

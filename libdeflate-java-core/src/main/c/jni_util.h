@@ -1,11 +1,14 @@
-#include <jni.h>
-
 #ifndef JNIUTIL_H
 #define JNIUTIL_H
 
-#define LIBDEFLATEJAVA_PUBLIC __attribute__((visibility("default")))
+#include <jni.h>
 
-JNIEXPORT void JNICALL
-throwException(JNIEnv *env, const char *type, const char *msg);
+#ifndef _WIN32
+  #define LIBDEFLATEJAVA_PUBLIC __attribute__((visibility("default")))
+#else
+  #define LIBDEFLATEJAVA_PUBLIC
+#endif
+
+void throwException(JNIEnv *env, const char *type, const char *msg);
 
 #endif
