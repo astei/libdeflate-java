@@ -6,4 +6,4 @@ env:
   - CC=gcc
   - CC=clang
 before_install:
-  - apt-get -y install make
+  - sudo apt-get -y install make
