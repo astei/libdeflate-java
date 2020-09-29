@@ -9,7 +9,6 @@
 
 CC = cl
 LD = link
-AR = lib
 CFLAGS = /MD /O2 -Isrc\main\c\libdeflate -Isrc\main\c -I"$(JAVA_HOME)\include" -I"$(JAVA_HOME)\include\win32"
 LDFLAGS =
 
@@ -38,7 +37,7 @@ clean:
 	-del src\main\c\*.obj src\main\c\libdeflate\lib\*.obj src\main\c\libdeflate\lib\x86\*.obj
 
 directories:
-	-mkdir ..\tmp\compiled\windows\amd64
+	-md ..\tmp\compiled\windows\amd64
 
 .c.obj:
 	$(CC) -c /Fo$@ $(CFLAGS) $**
