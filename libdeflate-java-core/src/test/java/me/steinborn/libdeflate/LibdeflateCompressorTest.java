@@ -1,5 +1,6 @@
 package me.steinborn.libdeflate;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -13,6 +14,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class LibdeflateCompressorTest {
@@ -21,6 +23,71 @@ public class LibdeflateCompressorTest {
         return Arrays.stream(ByteBufferMatrix.values())
                 .flatMap(bufferMatrix -> Arrays.stream(CompressionType.values())
                         .map(compressionType -> arguments(bufferMatrix, compressionType)));
+    }
+
+    @Test
+    void errorsIfSourceByteArrayNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(null, new byte[1], CompressionType.DEFLATE);
+            }
+        });
+    }
+
+    @Test
+    void errorsIfDestByteArrayNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(new byte[1], null, CompressionType.DEFLATE);
+            }
+        });
+    }
+
+    @Test
+    void errorsIfTypeByteArrayNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(new byte[1], new byte[1], null);
+            }
+        });
+    }
+
+    @Test
+    void errorsIfSourceByteBufferNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(null, ByteBuffer.allocate(1), CompressionType.DEFLATE);
+            }
+        });
+    }
+
+    @Test
+    void errorsIfDestByteBufferNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(ByteBuffer.allocate(1), null, CompressionType.DEFLATE);
+            }
+        });
+    }
+
+    @Test
+    void errorsIfTypeByteBufferNull() throws Exception {
+        assertThrows(NullPointerException.class, () -> {
+            try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
+                compressor.compress(ByteBuffer.allocate(1), ByteBuffer.allocate(1), null);
+            }
+        });
+    }
+
+    @Test
+    void ensureCompressorBombsOnClosed() throws Exception {
+        LibdeflateCompressor compressor = new LibdeflateCompressor();
+        compressor.close();
+
+        assertThrows(IllegalStateException.class, () -> compressor.compress(new byte[1], new byte[1], CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> compressor.compress(new byte[1], 0, 1, new byte[1], 0, 1, CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> compressor.compress(ByteBuffer.allocate(1), ByteBuffer.allocate(1), CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> compressor.getCompressBound(1, CompressionType.DEFLATE));
     }
 
     @ParameterizedTest

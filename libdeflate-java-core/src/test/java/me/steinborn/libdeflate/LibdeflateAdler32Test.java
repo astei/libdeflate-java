@@ -13,6 +13,7 @@ class LibdeflateAdler32Test {
 
     private static final String TEST_SIGNED_OVERFLOW = "libdeflate-jni is a very awesome JNI binding for libdeflate. Check it out!";
     private static final long TEST_SIGNED_OVERFLOW_ADLER32 = 3926923840L;
+    private static final long TEST_OFFSET_ADLER32 = 2969770419L;
 
     @Test
     void adler32Empty() {
@@ -32,7 +33,7 @@ class LibdeflateAdler32Test {
         byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
 
         LibdeflateAdler32 adler32 = new LibdeflateAdler32();
-        adler32.update(string, 0, string.length);
+        adler32.update(string);
         assertEquals(TEST_STRING_ADLER32, adler32.getValue());
     }
 
@@ -62,5 +63,13 @@ class LibdeflateAdler32Test {
         byte[] msg = TEST_SIGNED_OVERFLOW.getBytes(StandardCharsets.US_ASCII);
         adler32.update(msg, 0, msg.length);
         assertEquals(TEST_SIGNED_OVERFLOW_ADLER32, adler32.getValue());
+    }
+
+    @Test
+    void adler32Offset() {
+        LibdeflateAdler32 adler32 = new LibdeflateAdler32();
+        byte[] msg = TEST_SIGNED_OVERFLOW.getBytes(StandardCharsets.US_ASCII);
+        adler32.update(msg, 1, msg.length - 2);
+        assertEquals(TEST_OFFSET_ADLER32, adler32.getValue());
     }
 }

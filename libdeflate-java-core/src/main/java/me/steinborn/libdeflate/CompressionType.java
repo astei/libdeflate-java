@@ -20,9 +20,7 @@ public enum CompressionType {
 
     int getNativeType() {
         Integer type = NATIVE_MAPPINGS.get(this);
-        if (type == null) {
-            throw new IllegalStateException("No native type associated with " + this + " - this is a bug in libdeflate-java");
-        }
+        assert type != null : "No native type associated with " + this + " - this is a bug in libdeflate-java";
         return type;
     }
 }

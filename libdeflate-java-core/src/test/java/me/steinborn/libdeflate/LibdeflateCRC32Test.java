@@ -13,6 +13,7 @@ class LibdeflateCRC32Test {
 
     private static final String TEST_SIGNED_OVERFLOW = "libdeflate-jni is a very awesome JNI binding for libdeflate. Check it out!";
     private static final long TEST_SIGNED_OVERFLOW_CRC32 = 2599184220L;
+    private static final long TEST_OFFSET_CRC32 = 1838842947;
 
     @Test
     void crc32Empty() {
@@ -32,7 +33,7 @@ class LibdeflateCRC32Test {
         byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
 
         LibdeflateCRC32 crc32 = new LibdeflateCRC32();
-        crc32.update(string, 0, string.length);
+        crc32.update(string);
         assertEquals(TEST_STRING_CRC32, crc32.getValue());
     }
 
@@ -57,10 +58,18 @@ class LibdeflateCRC32Test {
     }
 
     @Test
-    void adler32SignedOverflow() {
+    void crc32SignedOverflow() {
         LibdeflateCRC32 crc32 = new LibdeflateCRC32();
         byte[] msg = TEST_SIGNED_OVERFLOW.getBytes(StandardCharsets.US_ASCII);
         crc32.update(msg, 0, msg.length);
         assertEquals(TEST_SIGNED_OVERFLOW_CRC32, crc32.getValue());
+    }
+
+    @Test
+    void crc32Offset() {
+        LibdeflateCRC32 crc32 = new LibdeflateCRC32();
+        byte[] msg = TEST_SIGNED_OVERFLOW.getBytes(StandardCharsets.US_ASCII);
+        crc32.update(msg, 1, msg.length - 2);
+        assertEquals(TEST_OFFSET_CRC32, crc32.getValue());
     }
 }
