@@ -20,7 +20,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
         env:
           CC: gcc
   ubuntu-clang:
@@ -36,7 +38,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
         env:
           CC: clang
   windows-msvc:
@@ -50,4 +54,6 @@ jobs:
         with:
           java-version: 1.8
       - name: Build with Gradle
-        run: cmd /C gradlew.bat build
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
