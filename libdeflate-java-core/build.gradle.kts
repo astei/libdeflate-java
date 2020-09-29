@@ -16,7 +16,10 @@ task("compileNatives") {
     // Note: we should prefer compilation with GCC
     val jniTempPath = Paths.get(project.rootDir.toString(), "tmp")
 
-    fun osSetup(env: MutableMap<String, String>) {
+    doLast {
+        val env = hashMapOf("LIB_NAME" to "libdeflate_jni")
+        env.putAll(System.getenv())
+
         when {
             Os.isFamily(Os.FAMILY_MAC) -> {
                 // lol
@@ -33,26 +36,27 @@ task("compileNatives") {
                 env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", osName, System.getProperty("os.arch")).toString()
                 env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", osName, System.getProperty("os.arch")).toString()
                 env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC"
+
+                exec {
+                    executable = "make"
+                    args = arrayListOf("clean", "all")
+                    environment = env.toMap()
+                }
             }
             Os.isFamily(Os.FAMILY_WINDOWS) -> {
-                // Hey, so, um, I hope you're running something NT-based, because bless your heart if you're still on 9x
-                throw RuntimeException("Please install a better, more secure OS.")
+                // Windows is a very, very special case... we compile with Microsoft Visual Studio, which is a mess.
+                // There is the `vswhere` utility, which brings a tiny bit of sanity, but alas... it is probably better
+                // to invoke the build from a batch script.
+                //
+                // We'll need `vswhere` (you can install it via Chocolatey).
+                exec {
+                    executable = "cmd"
+                    args = arrayListOf("/C", "windows_build.bat")
+                }
             }
             else -> {
                 throw RuntimeException("Your strange, weird OS is not supported. Did you know it is 2020?")
             }
-        }
-    }
-
-    doLast {
-        val env = hashMapOf("LIB_NAME" to "libdeflate_jni")
-        env.putAll(System.getenv())
-        osSetup(env)
-
-        exec {
-            executable = "make"
-            args = arrayListOf("clean", "all")
-            environment = env.toMap()
         }
     }
 }
