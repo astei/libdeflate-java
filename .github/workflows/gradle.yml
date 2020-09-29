@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -25,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -39,9 +43,11 @@ jobs:
     runs-on: windows-2016
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
       - name: Build with Gradle
-        run: gradlew.bat build
+        run: cmd /C gradlew.bat build
