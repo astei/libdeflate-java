@@ -50,10 +50,10 @@ I will add support for other platforms as time and demand permits. Contributions
 ### Supported platforms
 
 * Linux x86_64
+* Windows x86_64
 
 ### Planned support
 
-* Windows x86_64
 * macOS x86_64
 * macOS aarch64
 * Linux aarch64
