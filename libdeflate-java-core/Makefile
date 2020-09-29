@@ -47,7 +47,7 @@ all: directories $(LIB)
 
 $(LIB): $(OBJS)
 	mkdir -p $(LIB_DIR)
-	$(CC) -shared -o $(LIB) $^
+	$(CC) -shared -o $(LIB) $(CFLAGS) $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -o $@ -c $< $(CFLAGS)

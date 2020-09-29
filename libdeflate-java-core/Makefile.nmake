@@ -9,8 +9,8 @@
 
 CC = cl
 LD = link
-CFLAGS = /MD /O2 -Isrc\main\c\libdeflate -Isrc\main\c -I"$(JAVA_HOME)\include" -I"$(JAVA_HOME)\include\win32"
-LDFLAGS =
+CFLAGS = /NOLOGO /GL /MD /O2 -Isrc\main\c\libdeflate -Isrc\main\c -I"$(JAVA_HOME)\include" -I"$(JAVA_HOME)\include\win32"
+LDFLAGS = /NOLOGO /LTCG
 
 SHARED_LIB = ..\tmp\compiled\windows\amd64\libdeflate_jni.dll
 

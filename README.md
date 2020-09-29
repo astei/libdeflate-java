@@ -60,6 +60,8 @@ I will add support for other platforms as time and demand permits. Contributions
 
 ## Building
 
+### Linux
+
 You will need:
 
 * a basic C toolchain
@@ -69,6 +71,16 @@ You will need:
 Make sure `JAVA_HOME` is defined and build this project as usual for a Gradle project. I have looked at options
 for building native modules with Gradle, and unfortunately dropping down to GNU Make has wound up being the most sane
 solution.
+
+### Windows
+
+Slightly different needs here. On Windows, this library builds using the Microsoft toolchain:
+
+* Visual Studio build tools for C/C++. Visual Studio 2017 Enterprise and Visual Studio 2019 Community are known to
+  work.
+* `vswhere` (this can be installed using Chocolatey with `choco install vswhere`)
+
+
 
 ## API usage
 

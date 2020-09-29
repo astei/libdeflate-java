@@ -35,7 +35,7 @@ task("compileNatives") {
                 env["JNI_PLATFORM"] = osName
                 env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", osName, System.getProperty("os.arch")).toString()
                 env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", osName, System.getProperty("os.arch")).toString()
-                env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC"
+                env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC -flto"
 
                 exec {
                     executable = "make"
