@@ -24,7 +24,7 @@ libdeflate library.
 
 ```kotlin
 dependencies {
-    implementation("me.steinborn.libdeflate-java-core:0.1.0-SNAPSHOT")
+    implementation("me.steinborn:libdeflate-java-core:0.1.0-SNAPSHOT")
 }
 ```
 
@@ -41,6 +41,11 @@ There are, of course, downsides:
 * libdeflate does not support a streaming API yet. Should a streaming API be added to `libdeflate` we will add support for it.
 * libdeflate is only optimized for x86, x86_64 and aarch64. This should be sufficient for the vast majority of users, and there
   are generic routines in case your platform does not have an optimized routine.
+* Some JVMs may choose to intrinsicify certain `java.util.zip` APIs. In general, the deflate and inflate implementations are
+  not intrinsified, whereas CRC32 computations are. We must hook into libdeflate through JNI, which does introduce some
+  overhead. It is hoped that projects like [Project Panama](https://openjdk.java.net/projects/panama/) will reduce this overhead
+  and eliminate the requirement to use JNI except to support backwards compatibility. (In other words, the final state of this
+  project is to wrap the regular libdeflate library directly without marshalling across the JNI layer.)
 
 ## Compatibility
 
@@ -79,8 +84,6 @@ Slightly different needs here. On Windows, this library builds using the Microso
 * Visual Studio build tools for C/C++. Visual Studio 2017 Enterprise and Visual Studio 2019 Community are known to
   work.
 * `vswhere` (this can be installed using Chocolatey with `choco install vswhere`)
-
-
 
 ## API usage
 
