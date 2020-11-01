@@ -54,6 +54,19 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
     }
 
     /**
+     * Decompresses the given {@code in} array into the {@code out} array. This method assumes the output buffer has
+     * exactly the number of bytes as the decompressed contents or less.
+     *
+     * @param in the source array with compressed
+     * @param out the destination which will hold decompressed data
+     * @param type the compression container to use
+     * @throws DataFormatException if the provided data was corrupt, or the data decompressed successfully but not to {@code uncompressedSize}
+     */
+    public void decompress(byte[] in, byte[] out, CompressionType type) throws DataFormatException {
+        decompress(in, out, type, out.length);
+    }
+
+    /**
      * Decompresses the given {@code in} array into the {@code out} array. This method assumes the uncompressed size of
      * the data is known.
      *
@@ -180,6 +193,20 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
         out.position((int) (out.position() + outRealSize));
         in.position((int) (in.position() + this.readStreamBytes()));
         return outRealSize;
+    }
+
+    /**
+     * Decompresses the given {@code in} ByteBuffer into the {@code out} ByteBuffer. When the decompression operation
+     * completes, the {@code position} of the output buffer will be incremented by the number of bytes produced, and
+     * the input {@code position} will be incremented by the number of bytes read.
+     *
+     * @param in the source byte buffer to decompress
+     * @param out the destination which will hold decompressed data
+     * @param type the compression container in use
+     * @throws DataFormatException if the provided data was corrupt, or the data decompresses to an invalid size
+     */
+    public void decompress(ByteBuffer in, ByteBuffer out, CompressionType type) throws DataFormatException {
+        decompress0(in, out, type, out.remaining());
     }
 
     /**

@@ -3,7 +3,6 @@ package me.steinborn.libdeflate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
@@ -19,10 +18,18 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class LibdeflateCompressorTest {
     private static Stream<Arguments> byteBufferCompressionCombos() {
-        // a product set of ByteBufferMatrix with CompressionTypes
+        // a product set of ByteBufferMatrix with CompressionTypes and UseDecompressors
         return Arrays.stream(ByteBufferMatrix.values())
                 .flatMap(bufferMatrix -> Arrays.stream(CompressionType.values())
-                        .map(compressionType -> arguments(bufferMatrix, compressionType)));
+                        .flatMap(compressionType -> Arrays.stream(UseDecompressor.values())
+                                .map(decompressor -> arguments(bufferMatrix, compressionType, decompressor))));
+    }
+
+    private static Stream<Arguments> byteArraySanityCombos() {
+        // a product set of ByteBufferMatrix with UseDecompressors
+        return Arrays.stream(CompressionType.values())
+                .flatMap(compressionType -> Arrays.stream(UseDecompressor.values())
+                        .map(decompressor -> arguments(compressionType, decompressor)));
     }
 
     @Test
@@ -80,7 +87,7 @@ public class LibdeflateCompressorTest {
     }
 
     @Test
-    void ensureCompressorBombsOnClosed() throws Exception {
+    void ensureCompressorFailsOnClosed() throws Exception {
         LibdeflateCompressor compressor = new LibdeflateCompressor();
         compressor.close();
 
@@ -92,7 +99,7 @@ public class LibdeflateCompressorTest {
 
     @ParameterizedTest
     @MethodSource("byteBufferCompressionCombos")
-    void compressorByteBufferSanity(ByteBufferMatrix matrix, CompressionType compressionType) throws Exception {
+    void compressorByteBufferSanity(ByteBufferMatrix matrix, CompressionType compressionType, UseDecompressor decompressor) throws Exception {
         ByteBuffer source = matrix.allocateSource(100);
         ByteBuffer destination = matrix.allocateDestination(200);
         for (int i = 0; i < 20; i++) {
@@ -106,13 +113,13 @@ public class LibdeflateCompressorTest {
             destination.flip();
 
             source.position(0);
-            verifyWrittenData(source, destination, compressionType);
+            verifyWrittenData(source, destination, compressionType, decompressor);
         }
     }
 
     @ParameterizedTest
     @MethodSource("byteBufferCompressionCombos")
-    void compressorByteBufferSanityNonZeroPosition(ByteBufferMatrix matrix, CompressionType compressionType) throws Exception {
+    void compressorByteBufferSanityNonZeroPosition(ByteBufferMatrix matrix, CompressionType compressionType, UseDecompressor decompressor) throws Exception {
         ByteBuffer source = matrix.allocateSource(100);
         ByteBuffer destination = matrix.allocateDestination(200);
         source.position(5);
@@ -128,13 +135,13 @@ public class LibdeflateCompressorTest {
             destination.flip();
 
             source.position(5);
-            verifyWrittenData(source, destination, compressionType);
+            verifyWrittenData(source, destination, compressionType, decompressor);
         }
     }
 
     @ParameterizedTest
-    @EnumSource(CompressionType.class)
-    void compressorByteArraySanity(CompressionType compressionType) throws Exception {
+    @MethodSource("byteArraySanityCombos")
+    void compressorByteArraySanity(CompressionType compressionType, UseDecompressor decompressor) throws Exception {
         byte[] source = new byte[100];
         byte[] destination = new byte[200];
         ByteBuffer sourceAsBuf = ByteBuffer.wrap(source);
@@ -144,13 +151,13 @@ public class LibdeflateCompressorTest {
 
         try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
             int produced = compressor.compress(source, destination, compressionType);
-            verifyWrittenData(ByteBuffer.wrap(source), ByteBuffer.wrap(destination, 0, produced), compressionType);
+            verifyWrittenData(ByteBuffer.wrap(source), ByteBuffer.wrap(destination, 0, produced), compressionType, decompressor);
         }
     }
 
     @ParameterizedTest
-    @EnumSource(CompressionType.class)
-    void compressorByteArrayNonZeroSourcePosition(CompressionType compressionType) throws Exception {
+    @MethodSource("byteArraySanityCombos")
+    void compressorByteArrayNonZeroSourcePosition(CompressionType compressionType, UseDecompressor decompressor) throws Exception {
         byte[] source = new byte[100];
         byte[] destination = new byte[200];
         ByteBuffer sourceAsBuf = ByteBuffer.wrap(source, 5, source.length - 5);
@@ -161,13 +168,13 @@ public class LibdeflateCompressorTest {
         try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
             int produced = compressor.compress(source, 5, source.length - 5, destination, 0, destination.length, compressionType);
             sourceAsBuf.position(5);
-            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 0, produced), compressionType);
+            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 0, produced), compressionType, decompressor);
         }
     }
 
     @ParameterizedTest
-    @EnumSource(CompressionType.class)
-    void compressorByteArrayNonZeroDestinationPosition(CompressionType compressionType) throws Exception {
+    @MethodSource("byteArraySanityCombos")
+    void compressorByteArrayNonZeroDestinationPosition(CompressionType compressionType, UseDecompressor decompressor) throws Exception {
         byte[] source = new byte[100];
         byte[] destination = new byte[200];
         ByteBuffer sourceAsBuf = ByteBuffer.wrap(source);
@@ -178,31 +185,46 @@ public class LibdeflateCompressorTest {
         try (LibdeflateCompressor compressor = new LibdeflateCompressor()) {
             int produced = compressor.compress(source, 0, source.length, destination, 10, destination.length - 10, compressionType);
             sourceAsBuf.position(0);
-            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 10, produced), compressionType);
+            verifyWrittenData(sourceAsBuf, ByteBuffer.wrap(destination, 10, produced), compressionType, decompressor);
         }
     }
 
-    private void verifyWrittenData(ByteBuffer source, ByteBuffer destination, CompressionType compressionType) throws Exception {
-        // Drain the destination buffer and use regular java.util.zip.Inflater to verify the result
-        byte[] written = new byte[destination.remaining()];
-        destination.get(written);
+    private void verifyWrittenData(ByteBuffer source, ByteBuffer destination, CompressionType compressionType, UseDecompressor decompressor) throws Exception {
+        // Drain the destination buffer and use regular java.util.zip.Inflater (or libdeflate) to verify the result
+        if (decompressor == UseDecompressor.JAVA) {
+            byte[] compressed = new byte[destination.remaining()];
+            destination.get(compressed);
 
-        byte[] data = new byte[source.remaining()];
-        int read;
-        if (compressionType == CompressionType.GZIP) {
-            try (GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(written))) {
-                read = in.read(data);
+            byte[] read = new byte[source.remaining()];
+            if (compressionType == CompressionType.GZIP) {
+                try (GZIPInputStream in = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
+                    in.read(read);
+                }
+            } else {
+                Inflater inflater = new Inflater(compressionType == CompressionType.DEFLATE);
+                try {
+                    inflater.setInput(compressed);
+                    inflater.inflate(read);
+                } finally {
+                    inflater.end();
+                }
             }
+
+            assertEquals(source, ByteBuffer.wrap(read), "Output from libdeflate compressor doesn't match input (as decompressed by j.u.z)");
         } else {
-            Inflater inflater = new Inflater(compressionType == CompressionType.DEFLATE);
-            try {
-                inflater.setInput(written);
-                read = inflater.inflate(data);
-            } finally {
-                inflater.end();
+            // These also serve as a test to ensure LibdeflateDecompressor is working.
+            ByteBuffer readHeap = ByteBuffer.allocate(source.remaining());
+            ByteBuffer readDirect = ByteBuffer.allocateDirect(source.remaining());
+            try (LibdeflateDecompressor libdeflateDecompressor = new LibdeflateDecompressor()) {
+                libdeflateDecompressor.decompress(destination.slice(), readHeap, compressionType);
+                libdeflateDecompressor.decompress(destination.slice(), readDirect, compressionType);
             }
-        }
 
-        assertEquals(source, ByteBuffer.wrap(data, 0, read));
+            readHeap.flip();
+            readDirect.flip();
+
+            assertEquals(source, readHeap, "Output from libdeflate compressor doesn't match input (as decompressed by libdeflate, heap buffer destination)");
+            assertEquals(source, readDirect, "Output from libdeflate compressor doesn't match input (as decompressed by libdeflate, direct buffer destination)");
+        }
     }
 }
