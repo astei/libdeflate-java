@@ -20,11 +20,27 @@ libdeflate library.
 </dependency>
 ```
 
+For Netty extensions:
+```xml
+<dependency>
+    <groupId>me.steinborn</groupId>
+    <artifactId>libdeflate-java-netty</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+
 ### Gradle
 
 ```kotlin
 dependencies {
     implementation("me.steinborn:libdeflate-java-core:0.1.0-SNAPSHOT")
+}
+```
+
+For Netty extensions:
+```kotlin
+dependencies {
+    implementation("me.steinborn:libdeflate-java-netty:0.1.0-SNAPSHOT")
 }
 ```
 
@@ -98,3 +114,9 @@ cleaner.
 In addition, `me.steinborn.libdeflate.LibdeflateAdler32` provides a drop-in replacement for `java.util.zip.Adler32`
 and `me.steinborn.libdeflate.LibdeflateCRC32` is a drop-in replacement for `java.util.zip.CRC32`. As with the
 rest of the library, the Adler-32 and CRC32 implementations are well-optimized code that uses native hardware vector operations.
+
+### Netty extensions
+
+This library also provides an artifact that adds selected `libdeflate` functions that deal with Netty
+`ByteBuf`s, specifically `LibdeflateNettyCompressor` and `LibdeflateNettyDecompressor`. This support works best with
+contiguous, direct `ByteBuf` instances.

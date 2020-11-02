@@ -179,3 +179,13 @@ LIBDEFLATEJAVA_PUBLIC JNIEXPORT jlong JNICALL Java_me_steinborn_libdeflate_Libde
     (*env)->ReleasePrimitiveArrayCritical(env, in, inBytes, JNI_ABORT);
     return result;
 }
+
+LIBDEFLATEJAVA_PUBLIC JNIEXPORT jlong JNICALL Java_me_steinborn_libdeflate_LibdeflateDecompressor_decompressInMemory(
+    JNIEnv *env, jobject this,
+    jlong in, jint inPos, jint inSize,
+    jlong out, jint outPos, jint outSize,
+    jint type,
+    jint knownSize)
+{
+    return performDecompression(env, this, (jbyte*) in, inPos, inSize, (jbyte*) out, outPos, outSize, type, knownSize);
+}

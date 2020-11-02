@@ -11,8 +11,8 @@ import static me.steinborn.libdeflate.LibdeflateJavaUtils.checkBounds;
  * Represents a {@code libdeflate} compressor. This class contains compression methods for byte arrays, NIO ByteBuffers,
  * and the ability to compute a maximum possible bound for a given compression format and byte count.
  * <p/>
- * <strong>Thread-safety</strong>: libdeflate compressors are not thread-safe, however using multiple compressors per
- * thread is permissible.
+ * <strong>Thread-safety</strong>: Individual libdeflate compressors are not thread-safe. However you may create as many
+ * compressors as you'd like per thread.
  */
 public class LibdeflateCompressor implements Closeable, AutoCloseable {
     private static final int MINIMUM_COMPRESSION_LEVEL = 0;
@@ -186,5 +186,6 @@ public class LibdeflateCompressor implements Closeable, AutoCloseable {
     static native long compressOnlyDestinationDirect(long ctx, byte[] in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type);
     static native long compressOnlySourceDirect(long ctx, ByteBuffer in, int inPos, int inSize, byte[] out, int outPos, int outSize, int type);
     static native long compressBothDirect(long ctx, ByteBuffer in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type);
+    static native long compressInMemory(long ctx, long in, int inPos, int inSize, long out, int outPos, int outSize, int type);
     private static native long getCompressBound(long ctx, long count, int type);
 }

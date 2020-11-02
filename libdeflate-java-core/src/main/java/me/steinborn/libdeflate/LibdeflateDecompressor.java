@@ -11,8 +11,8 @@ import static me.steinborn.libdeflate.LibdeflateJavaUtils.checkBounds;
  * Represents a {@code libdeflate} decompressor. This class contains compression methods for byte arrays and NIO
  * ByteBuffers.
  * <p/>
- * <strong>Thread-safety</strong>: libdeflate decompressors are not thread-safe, however using multiple decompressors
- * per thread is permissible.
+ * <strong>Thread-safety</strong>: Individual libdeflate decompressors are not thread-safe. However you may create as many
+ * compressors as you'd like per thread.
  */
 public class LibdeflateDecompressor implements Closeable, AutoCloseable {
     static {
@@ -31,7 +31,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
         this.ctx = allocate();
     }
 
-    private void ensureNotClosed() {
+    void ensureNotClosed() {
         if (this.closed) {
             throw new IllegalStateException("Decompressor already closed.");
         }
@@ -50,6 +50,14 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
             throw new IllegalStateException("No byte array decompression done yet!");
         }
         availInBytes = -1;
+        return bytes;
+    }
+
+    long peekReadStreamBytes() {
+        long bytes = availInBytes;
+        if (bytes == -1) {
+            throw new IllegalStateException("No byte array decompression done yet!");
+        }
         return bytes;
     }
 
@@ -152,7 +160,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
         return decompressBothHeap(in, inOff, inLen, out, outOff, outLen, type.getNativeType(), -1);
     }
 
-    private long decompress0(ByteBuffer in, ByteBuffer out, CompressionType type, int uncompressedSize) throws DataFormatException {
+    long decompress0(ByteBuffer in, ByteBuffer out, CompressionType type, int uncompressedSize, boolean advanceIndices) throws DataFormatException {
         ensureNotClosed();
         int nativeType = type.getNativeType();
 
@@ -190,8 +198,11 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
         if (uncompressedSize != -1) {
             outRealSize = uncompressedSize;
         }
-        out.position((int) (out.position() + outRealSize));
-        in.position((int) (in.position() + this.readStreamBytes()));
+
+        if (advanceIndices) {
+            out.position((int) (out.position() + outRealSize));
+            in.position((int) (in.position() + this.readStreamBytes()));
+        }
         return outRealSize;
     }
 
@@ -206,7 +217,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
      * @throws DataFormatException if the provided data was corrupt, or the data decompresses to an invalid size
      */
     public void decompress(ByteBuffer in, ByteBuffer out, CompressionType type) throws DataFormatException {
-        decompress0(in, out, type, out.remaining());
+        decompress0(in, out, type, out.remaining(), true);
     }
 
     /**
@@ -220,7 +231,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
      * @throws DataFormatException if the provided data was corrupt, or the data decompresses to an invalid size
      */
     public void decompress(ByteBuffer in, ByteBuffer out, CompressionType type, int uncompressedSize) throws DataFormatException {
-        decompress0(in, out, type, uncompressedSize);
+        decompress0(in, out, type, uncompressedSize, true);
     }
 
     /**
@@ -240,7 +251,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
      * @throws DataFormatException if the provided data was corrupt, or the data decompresses to an invalid size
      */
     public long decompressUnknown(ByteBuffer in, ByteBuffer out, CompressionType type) throws DataFormatException {
-        return decompress0(in, out, type, -1);
+        return decompress0(in, out, type, -1, true);
     }
 
     @Override
@@ -254,8 +265,9 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
     private static native void initIDs();
     private static native long allocate();
     private static native void free(long ctx);
-    private native long decompressBothHeap(byte[] in, int inPos, int inSize, byte[] out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
-    private native long decompressOnlyDestinationDirect(byte[] in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
-    private native long decompressOnlySourceDirect(ByteBuffer in, int inPos, int inSize, byte[] out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
-    private native long decompressBothDirect(ByteBuffer in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
+    native long decompressBothHeap(byte[] in, int inPos, int inSize, byte[] out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
+    native long decompressOnlyDestinationDirect(byte[] in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
+    native long decompressOnlySourceDirect(ByteBuffer in, int inPos, int inSize, byte[] out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
+    native long decompressBothDirect(ByteBuffer in, int inPos, int inSize, ByteBuffer out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
+    native long decompressInMemory(long in, int inPos, int inSize, long out, int outPos, int outSize, int type, int knownSize) throws DataFormatException;
 }

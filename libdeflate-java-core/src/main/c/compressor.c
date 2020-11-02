@@ -110,6 +110,11 @@ LIBDEFLATEJAVA_PUBLIC JNIEXPORT jlong JNICALL Java_me_steinborn_libdeflate_Libde
     return result;
 }
 
+LIBDEFLATEJAVA_PUBLIC JNIEXPORT jlong JNICALL Java_me_steinborn_libdeflate_LibdeflateCompressor_compressInMemory
+  (JNIEnv *env, jclass klass, jlong ctx, jlong in, jint inPos, jint inSize, jlong out, jint outPos, jint outSize, jint type) {
+    return performCompression(ctx, (jbyte*) in, inPos, inSize, (jbyte*) out, outPos, outSize, type);
+}
+
 LIBDEFLATEJAVA_PUBLIC JNIEXPORT jlong JNICALL Java_me_steinborn_libdeflate_LibdeflateCompressor_getCompressBound(JNIEnv *env, jclass klass, jlong ctx, jlong length, jint type) {
     struct libdeflate_compressor *compressor = (struct libdeflate_compressor *) ctx;
     size_t result = 0;
