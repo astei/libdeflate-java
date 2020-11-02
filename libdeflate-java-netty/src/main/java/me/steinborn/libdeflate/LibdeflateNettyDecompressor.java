@@ -82,8 +82,10 @@ public class LibdeflateNettyDecompressor extends LibdeflateDecompressor {
             ByteBuffer outAsNio = out.nioBuffer(out.writerIndex(), out.writableBytes());
             int produced = (int) decompress0(inAsNio, outAsNio, type, uncompressedSize, false);
 
-            in.skipBytes((int) this.readStreamBytes());
-            out.writerIndex(out.writerIndex() + produced);
+            if (advanceIndices) {
+                in.skipBytes((int) this.readStreamBytes());
+                out.writerIndex(out.writerIndex() + produced);
+            }
             return produced;
         }
     }
