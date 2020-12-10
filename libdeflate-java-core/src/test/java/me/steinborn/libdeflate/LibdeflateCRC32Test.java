@@ -29,6 +29,19 @@ class LibdeflateCRC32Test {
     }
 
     @Test
+    void crc32ResetCorrectly() {
+        LibdeflateCRC32 crc32 = new LibdeflateCRC32();
+        crc32.update(0x42);
+        assertEquals(1255198513, crc32.getValue());
+
+        crc32.reset();
+
+        byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
+        crc32.update(string);
+        assertEquals(TEST_STRING_CRC32, crc32.getValue());
+    }
+
+    @Test
     void crc32Heap() {
         byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
 
