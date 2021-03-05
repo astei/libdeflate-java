@@ -29,6 +29,19 @@ class LibdeflateAdler32Test {
     }
 
     @Test
+    void adler32ResetCorrectly() {
+        LibdeflateAdler32 adler32 = new LibdeflateAdler32();
+        adler32.update(0x42);
+        assertEquals(4390979, adler32.getValue());
+
+        adler32.reset();
+
+        byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
+        adler32.update(string);
+        assertEquals(TEST_STRING_ADLER32, adler32.getValue());
+    }
+
+    @Test
     void adler32Heap() {
         byte[] string = TEST_STRING.getBytes(StandardCharsets.US_ASCII);
 
