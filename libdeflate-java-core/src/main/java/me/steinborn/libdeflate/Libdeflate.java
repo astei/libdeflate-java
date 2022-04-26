@@ -1,9 +1,11 @@
 package me.steinborn.libdeflate;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 
@@ -38,7 +40,13 @@ public class Libdeflate {
         try {
             InputStream nativeLib = Libdeflate.class.getResourceAsStream(path);
             if (nativeLib == null) {
-                throw new IllegalStateException("Native library " + path + " not found.");
+                // in case the user is trying to load native library from an absolute path
+                Path libPath = Paths.get(path);
+                if (Files.exists(libPath) && Files.isRegularFile(libPath)) {
+                    nativeLib = new FileInputStream(path);
+                } else {
+                    throw new IllegalStateException("Native library " + path + " not found.");
+                }
             }
 
             Path tempFile = createTemporaryNativeFilename(path.substring(path.lastIndexOf('.')));
