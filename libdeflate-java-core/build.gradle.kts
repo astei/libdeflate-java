@@ -62,8 +62,10 @@ task("compileNatives") {
 }
 
 sourceSets {
-    main {
-        resources.srcDir(Paths.get(project.rootDir.toString(), "tmp", "compiled"))
+    if (!project.hasProperty("only_interface")) {
+        main {
+            resources.srcDir(Paths.get(project.rootDir.toString(), "tmp", "compiled"))
+        }
     }
 }
 
