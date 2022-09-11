@@ -54,13 +54,15 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
     }
 
     /**
-     * Decompresses the given {@code in} array into the {@code out} array. This method assumes the output buffer has
-     * exactly the number of bytes as the decompressed contents or less.
+     * Decompresses the given {@code in} array into the {@code out} array. This method assumes that the length of
+     * {@code out} is the size of the uncompressed output. If this is not true, use
+     * {@link #decompressUnknownSize(byte[], byte[], CompressionType)} instead.
      *
      * @param in the source array with compressed
      * @param out the destination which will hold decompressed data
      * @param type the compression container to use
-     * @throws DataFormatException if the provided data was corrupt, or the data decompressed successfully but not to {@code uncompressedSize}
+     * @throws DataFormatException if the provided data was corrupt, or the data decompressed successfully but it is
+     *                             less than the size of the output buffer
      */
     public void decompress(byte[] in, byte[] out, CompressionType type) throws DataFormatException {
         decompress(in, out, type, out.length);
@@ -97,16 +99,12 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
      * @param uncompressedSize the known size of the data, which is also treated as the length into the output array from {@code outOff}
      * @throws DataFormatException if the provided data was corrupt, or the data decompressed successfully but not to {@code uncompressedSize}
      */
-    public void decompress(byte[] in, int inOff, int inLen, byte[] out, int outOff, CompressionType type, int uncompressedSize) throws DataFormatException {
+    public void decompress(byte[] in, int inOff, int inLen, byte[] out, int outOff, int outLen, CompressionType type, int uncompressedSize) throws DataFormatException {
         ensureNotClosed();
 
-        int outAvail = out.length - outOff;
         checkBounds(in.length, inOff, inLen);
-        checkBounds(out.length, outOff, outAvail);
-        if (uncompressedSize > outAvail) {
-            throw new IndexOutOfBoundsException("uncompressedSize(" + uncompressedSize + ") > out(" + outAvail + ")");
-        }
-        decompressBothHeap(in, inOff, inLen, out, outOff, outAvail, type.getNativeType(), uncompressedSize);
+        checkBounds(out.length, outOff, outLen);
+        decompressBothHeap(in, inOff, inLen, out, outOff, outLen, type.getNativeType(), uncompressedSize);
     }
 
     /**
@@ -198,7 +196,8 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
     /**
      * Decompresses the given {@code in} ByteBuffer into the {@code out} ByteBuffer. When the decompression operation
      * completes, the {@code position} of the output buffer will be incremented by the number of bytes produced, and
-     * the input {@code position} will be incremented by the number of bytes read.
+     * the input {@code position} will be incremented by the number of bytes read. This function assumes the size of
+     * the uncompressed data is the amount of bytes remaining in the buffer (the limit minus its position).
      *
      * @param in the source byte buffer to decompress
      * @param out the destination which will hold decompressed data

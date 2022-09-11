@@ -56,7 +56,7 @@ public class LibdeflateCompressor implements Closeable, AutoCloseable {
     }
 
     /**
-     * Compresses the given {@code in} array into the {@code out} array.
+     * Compresses the entirety of {@code in} array into the {@code out} array.
      *
      * @param in the source array to compress
      * @param out the destination which will hold compressed data
