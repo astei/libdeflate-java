@@ -81,11 +81,10 @@ task("compileNatives") {
                     if (System.getenv("CC") == null) {
                         env["CC"] = "gcc"
                     }
-                    val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
                     env["DYLIB_SUFFIX"] = "dll"
-                    env["JNI_PLATFORM"] = osName
-                    env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", osName, System.getProperty("os.arch")).toString()
-                    env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", osName, System.getProperty("os.arch")).toString()
+                    env["JNI_PLATFORM"] = "windows"
+                    env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", "windows", System.getProperty("os.arch")).toString()
+                    env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", "windows", System.getProperty("os.arch")).toString()
                     env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC -flto"
 
                     exec {
