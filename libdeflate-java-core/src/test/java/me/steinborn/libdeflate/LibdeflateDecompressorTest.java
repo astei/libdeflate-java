@@ -1,18 +1,12 @@
 package me.steinborn.libdeflate;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.stream.Stream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -94,5 +88,8 @@ public class LibdeflateDecompressorTest {
         assertThrows(IllegalStateException.class, () -> decompressor.decompress(new byte[1], new byte[1], CompressionType.DEFLATE));
         assertThrows(IllegalStateException.class, () -> decompressor.decompress(new byte[1], 0, 1, new byte[1], 0, 1, CompressionType.DEFLATE, 1));
         assertThrows(IllegalStateException.class, () -> decompressor.decompress(ByteBuffer.allocate(1), ByteBuffer.allocate(1), CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> decompressor.decompressUnknownSize(new byte[1], new byte[1], CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> decompressor.decompressUnknownSize(new byte[1], 0, 1, new byte[1], 0, 1, CompressionType.DEFLATE));
+        assertThrows(IllegalStateException.class, () -> decompressor.decompressUnknownSize(ByteBuffer.allocate(1), ByteBuffer.allocate(1), CompressionType.DEFLATE));
     }
 }

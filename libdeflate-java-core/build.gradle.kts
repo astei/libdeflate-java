@@ -66,15 +66,35 @@ task("compileNatives") {
                 }
             }
             Os.isFamily(Os.FAMILY_WINDOWS) -> {
-                // Windows is a very, very special case... we compile with Microsoft Visual Studio, which is a mess.
-                // There is the `vswhere` utility, which brings a tiny bit of sanity, but alas... it is probably better
-                // to invoke the build from a batch script.
-                //
-                // We'll need `vswhere` (you can install it via Chocolatey).
-                exec {
-                    executable = "cmd"
-                    args = arrayListOf("/C", "windows_build.bat")
+                if (System.getenv("MSVC") != null) {
+                    // Windows is a very, very special case... we compile with Microsoft Visual Studio, which is a mess.
+                    // There is the `vswhere` utility, which brings a tiny bit of sanity, but alas... it is probably better
+                    // to invoke the build from a batch script.
+                    //
+                    // We'll need `vswhere` (you can install it via Chocolatey).
+                    exec {
+                        executable = "cmd"
+                        args = arrayListOf("/C", "windows_build.bat")
+                    }
+                } else {
+                    // Attempt to build using an MSYS2 environment.
+                    if (System.getenv("CC") == null) {
+                        env["CC"] = "gcc"
+                    }
+                    val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+                    env["DYLIB_SUFFIX"] = "dll"
+                    env["JNI_PLATFORM"] = osName
+                    env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", osName, System.getProperty("os.arch")).toString()
+                    env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", osName, System.getProperty("os.arch")).toString()
+                    env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC -flto"
+
+                    exec {
+                        executable = "make"
+                        args = arrayListOf("clean", "all")
+                        environment = env.toMap()
+                    }
                 }
+
             }
             else -> {
                 throw RuntimeException("Your OS isn't supported. We'll take a PR!")

@@ -238,7 +238,7 @@ public class LibdeflateDecompressor implements Closeable, AutoCloseable {
      *         was too small
      * @throws DataFormatException if the provided data was corrupt, or the data decompresses to an invalid size
      */
-    public long decompressUnknown(ByteBuffer in, ByteBuffer out, CompressionType type) throws DataFormatException {
+    public long decompressUnknownSize(ByteBuffer in, ByteBuffer out, CompressionType type) throws DataFormatException {
         return decompress0(in, out, type, -1);
     }
 
