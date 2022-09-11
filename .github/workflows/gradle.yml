@@ -66,7 +66,7 @@ jobs:
             export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64/ &&
             cd libdeflate-java && ./gradlew build"
   windows-msvc:
-    runs-on: windows-2016
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
