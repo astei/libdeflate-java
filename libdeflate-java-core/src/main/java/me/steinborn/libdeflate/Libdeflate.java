@@ -78,7 +78,7 @@ public class Libdeflate {
     }
 
     private static String determineDylibSuffix() {
-        if (OS.startsWith("mac")) {
+        if (OS.startsWith("darwin")) {
             return ".dylib";
         } else if (OS.startsWith("win")) {
             return ".dll";

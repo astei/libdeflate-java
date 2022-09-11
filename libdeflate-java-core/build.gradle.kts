@@ -22,8 +22,21 @@ task("compileNatives") {
 
         when {
             Os.isFamily(Os.FAMILY_MAC) -> {
-                // lol
-                throw RuntimeException("Your expensive fruit computer needs to go into the trash.")
+                // macOS is just a Unix like the rest.
+                if (System.getenv("CC") == null) {
+                    env["CC"] = "clang"
+                }
+                env["DYLIB_SUFFIX"] = "dylib"
+                env["JNI_PLATFORM"] = "darwin"
+                env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", "darwin", System.getProperty("os.arch")).toString()
+                env["OBJ_DIR"] = Paths.get(jniTempPath.toString(), "objects", "darwin", System.getProperty("os.arch")).toString()
+                env["CFLAGS"] = "-O2 -fomit-frame-pointer -Werror -Wall -fPIC -flto"
+
+                exec {
+                    executable = "make"
+                    args = arrayListOf("clean", "all")
+                    environment = env.toMap()
+                }
             }
             Os.isFamily(Os.FAMILY_UNIX) -> {
                 // Cover most Unices. It's 2020, so hopefully you're compiling on a modern open-source BSD or Linux distribution...
