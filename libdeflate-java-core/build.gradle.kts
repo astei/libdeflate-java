@@ -68,7 +68,7 @@ task("compileNatives") {
                 }
             }
             else -> {
-                throw RuntimeException("Your strange, weird OS is not supported. Did you know it is 2020?")
+                throw RuntimeException("Your OS isn't supported. We'll take a PR!")
             }
         }
     }
