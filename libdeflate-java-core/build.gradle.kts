@@ -1,4 +1,5 @@
 import java.nio.file.Paths
+import java.io.ByteArrayOutputStream
 import java.util.Locale
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -26,6 +27,14 @@ task("compileNatives") {
                 if (System.getenv("CC") == null) {
                     env["CC"] = "clang"
                 }
+
+                val byteOut = ByteArrayOutputStream()
+                project.exec {
+                    commandLine = listOf("/usr/libexec/java_home")
+                    standardOutput = byteOut
+                }
+
+                env["JAVA_HOME"] = byteOut.toString("UTF-8").trim()
                 env["DYLIB_SUFFIX"] = "dylib"
                 env["JNI_PLATFORM"] = "darwin"
                 env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", "darwin", System.getProperty("os.arch")).toString()

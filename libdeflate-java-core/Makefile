@@ -38,7 +38,7 @@ CFLAGS += -std=c99 -fvisibility=hidden \
     $(call cc-option,-Wvla)	\
     $(call cc-option,-Wimplicit-fallthrough)
 
-SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*/cpu_features.c)
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/arm/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/x86/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 .PHONY: directories
