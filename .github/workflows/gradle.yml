@@ -15,57 +15,31 @@ jobs:
           - { compiler: gcc }
           - { compiler: clang }
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
           java-version: 1.8
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: build
-        env:
-          CC: ${{matrix.compiler}}
-#  ubuntu-gcc-arm64:
-#    # Well, we've come to the end of the line. I've tried to get this working on native hardware and I've given up, past
-#    # running a worker on AWS Graviton or buying a Raspberry Pi. Travis CI has a lot of issues. If anyone would LIKE to
-#    # sponsor real ARM support for this, I'm all ears. For now, we will use user-mode emulation which works, albeit being
-#    # quite slow.
-#    runs-on: ubuntu-latest
-#    steps:
-#      - run: |
-#          docker run --rm --privileged multiarch/qemu-user-static:register --reset
-#      - uses: docker://multiarch/ubuntu-core:arm64-bionic
-#        with:
-#          args: 'uname -a'
-#      - uses: docker://multiarch/ubuntu-core:arm64-bionic
-#        with:
-#          args: >
-#            bash -c
-#            "apt-get update &&
-#            apt-get install -y build-essential openjdk-8-jdk-headless git &&
-#            mkdir /app && cd /app &&
-#            git clone --recursive https://github.com/astei/libdeflate-java.git &&
-#            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64/ &&
-#            cd libdeflate-java && ./gradlew build"
+        run: ./gradlew build
   windows-msvc:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
           java-version: 1.8
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: build
+        run: ./gradlew build
         env:
           MSVC: true
   windows-mingw:
@@ -82,30 +56,28 @@ jobs:
             git
             mingw-w64-x86_64-binutils
             mingw-w64-x86_64-gcc
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
           java-version: 1.8
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: build
+        run: ./gradlew build
   macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
           java-version: 1.8
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: build
+        run: ./gradlew build
