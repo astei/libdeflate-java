@@ -13,13 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "jni_util.h"
-
-void throwException(JNIEnv *env, const char *type, const char *msg) {
-  // We don't cache these, since they will only occur rarely.
-  jclass klazz = (*env)->FindClass(env, type);
-
-  if (klazz != 0) {
-    (*env)->ThrowNew(env, klazz, msg);
-  }
-}

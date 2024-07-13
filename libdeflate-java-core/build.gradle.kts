@@ -52,7 +52,7 @@ task("compileNatives") {
                 if (System.getenv("CC") == null) {
                     env["CC"] = "gcc"
                 }
-                val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+                val osName = System.getProperty("os.name").lowercase(Locale.ENGLISH)
                 env["DYLIB_SUFFIX"] = "so"
                 env["JNI_PLATFORM"] = osName
                 env["LIB_DIR"] = Paths.get(jniTempPath.toString(), "compiled", osName, System.getProperty("os.arch")).toString()
@@ -111,8 +111,8 @@ sourceSets {
 }
 
 tasks.jar {
-    val osName = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
-    val osArch = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH)
+    val osName = System.getProperty("os.name").lowercase(Locale.ENGLISH)
+    val osArch = System.getProperty("os.arch").lowercase(Locale.ENGLISH)
     archiveClassifier.set("${osName}-${osArch}")
 }
 
@@ -127,4 +127,10 @@ tasks.named<Test>("test") {
 
 tasks.jar {
     dependsOn(tasks.get("compileNatives"))
+}
+
+spotless {
+    cpp {
+        licenseHeaderFile(rootProject.file("license-header.txt"))
+    }
 }
