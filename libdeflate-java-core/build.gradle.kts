@@ -131,6 +131,7 @@ tasks.jar {
 
 spotless {
     cpp {
+        target("src/main/c/*")
         licenseHeaderFile(rootProject.file("license-header.txt"))
     }
 }
