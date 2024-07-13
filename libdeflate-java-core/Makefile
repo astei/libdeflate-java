@@ -38,7 +38,7 @@ CFLAGS += -std=c99 -fvisibility=hidden \
     $(call cc-option,-Wvla)	\
     $(call cc-option,-Wimplicit-fallthrough)
 
-SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/arm/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/x86/*.c)
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/arm/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/x86/*.c) $(wildcard $(SRC_DIR)/libdeflate/lib/riscv/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 .PHONY: directories
@@ -59,6 +59,7 @@ ${OBJ_DIR}:
 	mkdir -p $(OBJ_DIR)/libdeflate/lib
 	mkdir -p $(OBJ_DIR)/libdeflate/lib/x86
 	mkdir -p $(OBJ_DIR)/libdeflate/lib/arm
+	mkdir -p $(OBJ_DIR)/libdeflate/lib/riscv
 
 clean:
 	rm -rf $(LIB_DIR) $(OBJ_DIR)
