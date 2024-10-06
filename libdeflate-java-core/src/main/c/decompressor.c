@@ -144,7 +144,7 @@ Java_me_steinborn_libdeflate_LibdeflateDecompressor_decompressBothHeap(
   // We immediately commit the changes to the output array, but the input array
   // is never touched, so use JNI_ABORT to improve performance a bit.
   (*env)->ReleasePrimitiveArrayCritical(env, in, inBytes, JNI_ABORT);
-  (*env)->ReleasePrimitiveArrayCritical(env, in, outBytes, 0);
+  (*env)->ReleasePrimitiveArrayCritical(env, out, outBytes, 0);
   return result;
 }
 
